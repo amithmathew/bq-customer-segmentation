@@ -14,7 +14,7 @@ from `bigquery-public-data.thelook_ecommerce.products`
 
 
 -- Step 2: Create Customer Features Table
-create or replace table my-project.my_dataset.customer_features
+create or replace table my-project.my-dataset.customer_features
 as (
 with order_full as (
 select o.order_id, o.user_id, o.status, o.gender, o.num_of_item, o.created_at,
