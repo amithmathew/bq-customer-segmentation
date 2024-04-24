@@ -1,20 +1,20 @@
 ------
 -- Instructions:
 -- 
--- Replace my-project with your project name.
--- Replace my-dataset with your dataset name.
---
+-- Replace my-project with your project ID.
+-- Replace my-dataset with your dataset ID.
+-- Replace my-remote-connection with your Cloud Resource Connection name.
 ------
 
 
--- Create a list of features
-
+-- Step 1: Create a list of features
+-- Replace the list in `DEP_CAT` in the following SQL with the generated list here.
 select replace(regexp_replace(STRING_AGG(distinct CONCAT("'", department, '_', category, "'")), r'\s', ''), '&', '_')
 from `bigquery-public-data.thelook_ecommerce.products`
 
 
--- Create Customer Features Table
-create or replace table my_project.my_dataset.customer_features
+-- Step 2: Create Customer Features Table
+create or replace table my-project.my_dataset.customer_features
 as (
 with order_full as (
 select o.order_id, o.user_id, o.status, o.gender, o.num_of_item, o.created_at,
@@ -73,15 +73,15 @@ PIVOT (
   SUM(total_12_months) as total_12_months,
   SUM(total_24_months) AS total_24_months,
   SUM(total_36_months) AS total_36_months
-  FOR dep_cat IN (
+  FOR dep_cat IN ( -- Replace this with the results from the previous SQL
    'Women_Accessories','Women_Plus','Men_Accessories','Women_Swim','Women_Active','Women_Socks_Hosiery','Men_Active','Men_Socks','Men_Swim','Women_Dresses','Women_Pants_Capris','Men_FashionHoodies_Sweatshirts','Women_Skirts','Women_Blazers_Jackets','Women_Suits','Women_Tops_Tees','Women_Sweaters','Women_FashionHoodies_Sweatshirts','Women_Shorts','Women_Jeans','Women_Maternity','Men_Shorts','Men_Sleep_Lounge','Men_Suits_SportCoats','Men_Pants','Women_Intimates','Women_Sleep_Lounge','Women_Outerwear_Coats','Men_Tops_Tees','Men_Underwear','Men_Jeans','Men_Sweaters','Women_Leggings','Women_Jumpsuits_Rompers','Men_Outerwear_Coats','Women_ClothingSets'
   )
 )
 );
 
--- Cleanup the feature list, replace nulls with 0, etc.
+-- Step 2: Cleanup our features, replace nulls with 0, etc.
 
--- Step 1: AUtogenerate the SQL
+-- Step 2a: AUtogenerate the SQL
 select CONCAT("UPDATE `my-project.my-dataset.customer_features` SET ", 
 STRING_AGG(CONCAT(column_name, " = ", "COALESCE(", column_name, ", 0) ")), 'WHERE true;')
  from `my-project`.my-dataset.INFORMATION_SCHEMA.COLUMNS
@@ -89,12 +89,12 @@ STRING_AGG(CONCAT(column_name, " = ", "COALESCE(", column_name, ", 0) ")), 'WHER
  and column_name like 'total%';
 
 
--- Step 2: Replace the SQL below with the auto generated one from above.
+-- Step 2b: Replace the SQL below with the auto generated one from above.
 UPDATE `my-project.my-dataset.customer_features` 
 SET total_12_months_Women_Accessories = COALESCE(total_12_months_Women_Accessories, 0) ,total_24_months_Women_Accessories = COALESCE(total_24_months_Women_Accessories, 0) ,total_36_months_Women_Accessories = COALESCE(total_36_months_Women_Accessories, 0) ,total_12_months_Women_Plus = COALESCE(total_12_months_Women_Plus, 0) ,total_24_months_Women_Plus = COALESCE(total_24_months_Women_Plus, 0) ,total_36_months_Women_Plus = COALESCE(total_36_months_Women_Plus, 0) ,total_12_months_Men_Accessories = COALESCE(total_12_months_Men_Accessories, 0) ,total_24_months_Men_Accessories = COALESCE(total_24_months_Men_Accessories, 0) ,total_36_months_Men_Accessories = COALESCE(total_36_months_Men_Accessories, 0) ,total_12_months_Women_Swim = COALESCE(total_12_months_Women_Swim, 0) ,total_24_months_Women_Swim = COALESCE(total_24_months_Women_Swim, 0) ,total_36_months_Women_Swim = COALESCE(total_36_months_Women_Swim, 0) ,total_12_months_Women_Active = COALESCE(total_12_months_Women_Active, 0) ,total_24_months_Women_Active = COALESCE(total_24_months_Women_Active, 0) ,total_36_months_Women_Active = COALESCE(total_36_months_Women_Active, 0) ,total_12_months_Women_Socks_Hosiery = COALESCE(total_12_months_Women_Socks_Hosiery, 0) ,total_24_months_Women_Socks_Hosiery = COALESCE(total_24_months_Women_Socks_Hosiery, 0) ,total_36_months_Women_Socks_Hosiery = COALESCE(total_36_months_Women_Socks_Hosiery, 0) ,total_12_months_Men_Active = COALESCE(total_12_months_Men_Active, 0) ,total_24_months_Men_Active = COALESCE(total_24_months_Men_Active, 0) ,total_36_months_Men_Active = COALESCE(total_36_months_Men_Active, 0) ,total_12_months_Men_Socks = COALESCE(total_12_months_Men_Socks, 0) ,total_24_months_Men_Socks = COALESCE(total_24_months_Men_Socks, 0) ,total_36_months_Men_Socks = COALESCE(total_36_months_Men_Socks, 0) ,total_12_months_Men_Swim = COALESCE(total_12_months_Men_Swim, 0) ,total_24_months_Men_Swim = COALESCE(total_24_months_Men_Swim, 0) ,total_36_months_Men_Swim = COALESCE(total_36_months_Men_Swim, 0) ,total_12_months_Women_Dresses = COALESCE(total_12_months_Women_Dresses, 0) ,total_24_months_Women_Dresses = COALESCE(total_24_months_Women_Dresses, 0) ,total_36_months_Women_Dresses = COALESCE(total_36_months_Women_Dresses, 0) ,total_12_months_Women_Pants_Capris = COALESCE(total_12_months_Women_Pants_Capris, 0) ,total_24_months_Women_Pants_Capris = COALESCE(total_24_months_Women_Pants_Capris, 0) ,total_36_months_Women_Pants_Capris = COALESCE(total_36_months_Women_Pants_Capris, 0) ,total_12_months_Men_FashionHoodies_Sweatshirts = COALESCE(total_12_months_Men_FashionHoodies_Sweatshirts, 0) ,total_24_months_Men_FashionHoodies_Sweatshirts = COALESCE(total_24_months_Men_FashionHoodies_Sweatshirts, 0) ,total_36_months_Men_FashionHoodies_Sweatshirts = COALESCE(total_36_months_Men_FashionHoodies_Sweatshirts, 0) ,total_12_months_Women_Skirts = COALESCE(total_12_months_Women_Skirts, 0) ,total_24_months_Women_Skirts = COALESCE(total_24_months_Women_Skirts, 0) ,total_36_months_Women_Skirts = COALESCE(total_36_months_Women_Skirts, 0) ,total_12_months_Women_Blazers_Jackets = COALESCE(total_12_months_Women_Blazers_Jackets, 0) ,total_24_months_Women_Blazers_Jackets = COALESCE(total_24_months_Women_Blazers_Jackets, 0) ,total_36_months_Women_Blazers_Jackets = COALESCE(total_36_months_Women_Blazers_Jackets, 0) ,total_12_months_Women_Suits = COALESCE(total_12_months_Women_Suits, 0) ,total_24_months_Women_Suits = COALESCE(total_24_months_Women_Suits, 0) ,total_36_months_Women_Suits = COALESCE(total_36_months_Women_Suits, 0) ,total_12_months_Women_Tops_Tees = COALESCE(total_12_months_Women_Tops_Tees, 0) ,total_24_months_Women_Tops_Tees = COALESCE(total_24_months_Women_Tops_Tees, 0) ,total_36_months_Women_Tops_Tees = COALESCE(total_36_months_Women_Tops_Tees, 0) ,total_12_months_Women_Sweaters = COALESCE(total_12_months_Women_Sweaters, 0) ,total_24_months_Women_Sweaters = COALESCE(total_24_months_Women_Sweaters, 0) ,total_36_months_Women_Sweaters = COALESCE(total_36_months_Women_Sweaters, 0) ,total_12_months_Women_FashionHoodies_Sweatshirts = COALESCE(total_12_months_Women_FashionHoodies_Sweatshirts, 0) ,total_24_months_Women_FashionHoodies_Sweatshirts = COALESCE(total_24_months_Women_FashionHoodies_Sweatshirts, 0) ,total_36_months_Women_FashionHoodies_Sweatshirts = COALESCE(total_36_months_Women_FashionHoodies_Sweatshirts, 0) ,total_12_months_Women_Shorts = COALESCE(total_12_months_Women_Shorts, 0) ,total_24_months_Women_Shorts = COALESCE(total_24_months_Women_Shorts, 0) ,total_36_months_Women_Shorts = COALESCE(total_36_months_Women_Shorts, 0) ,total_12_months_Women_Jeans = COALESCE(total_12_months_Women_Jeans, 0) ,total_24_months_Women_Jeans = COALESCE(total_24_months_Women_Jeans, 0) ,total_36_months_Women_Jeans = COALESCE(total_36_months_Women_Jeans, 0) ,total_12_months_Women_Maternity = COALESCE(total_12_months_Women_Maternity, 0) ,total_24_months_Women_Maternity = COALESCE(total_24_months_Women_Maternity, 0) ,total_36_months_Women_Maternity = COALESCE(total_36_months_Women_Maternity, 0) ,total_12_months_Men_Shorts = COALESCE(total_12_months_Men_Shorts, 0) ,total_24_months_Men_Shorts = COALESCE(total_24_months_Men_Shorts, 0) ,total_36_months_Men_Shorts = COALESCE(total_36_months_Men_Shorts, 0) ,total_12_months_Men_Sleep_Lounge = COALESCE(total_12_months_Men_Sleep_Lounge, 0) ,total_24_months_Men_Sleep_Lounge = COALESCE(total_24_months_Men_Sleep_Lounge, 0) ,total_36_months_Men_Sleep_Lounge = COALESCE(total_36_months_Men_Sleep_Lounge, 0) ,total_12_months_Men_Suits_SportCoats = COALESCE(total_12_months_Men_Suits_SportCoats, 0) ,total_24_months_Men_Suits_SportCoats = COALESCE(total_24_months_Men_Suits_SportCoats, 0) ,total_36_months_Men_Suits_SportCoats = COALESCE(total_36_months_Men_Suits_SportCoats, 0) ,total_12_months_Men_Pants = COALESCE(total_12_months_Men_Pants, 0) ,total_24_months_Men_Pants = COALESCE(total_24_months_Men_Pants, 0) ,total_36_months_Men_Pants = COALESCE(total_36_months_Men_Pants, 0) ,total_12_months_Women_Intimates = COALESCE(total_12_months_Women_Intimates, 0) ,total_24_months_Women_Intimates = COALESCE(total_24_months_Women_Intimates, 0) ,total_36_months_Women_Intimates = COALESCE(total_36_months_Women_Intimates, 0) ,total_12_months_Women_Sleep_Lounge = COALESCE(total_12_months_Women_Sleep_Lounge, 0) ,total_24_months_Women_Sleep_Lounge = COALESCE(total_24_months_Women_Sleep_Lounge, 0) ,total_36_months_Women_Sleep_Lounge = COALESCE(total_36_months_Women_Sleep_Lounge, 0) ,total_12_months_Women_Outerwear_Coats = COALESCE(total_12_months_Women_Outerwear_Coats, 0) ,total_24_months_Women_Outerwear_Coats = COALESCE(total_24_months_Women_Outerwear_Coats, 0) ,total_36_months_Women_Outerwear_Coats = COALESCE(total_36_months_Women_Outerwear_Coats, 0) ,total_12_months_Men_Tops_Tees = COALESCE(total_12_months_Men_Tops_Tees, 0) ,total_24_months_Men_Tops_Tees = COALESCE(total_24_months_Men_Tops_Tees, 0) ,total_36_months_Men_Tops_Tees = COALESCE(total_36_months_Men_Tops_Tees, 0) ,total_12_months_Men_Underwear = COALESCE(total_12_months_Men_Underwear, 0) ,total_24_months_Men_Underwear = COALESCE(total_24_months_Men_Underwear, 0) ,total_36_months_Men_Underwear = COALESCE(total_36_months_Men_Underwear, 0) ,total_12_months_Men_Jeans = COALESCE(total_12_months_Men_Jeans, 0) ,total_24_months_Men_Jeans = COALESCE(total_24_months_Men_Jeans, 0) ,total_36_months_Men_Jeans = COALESCE(total_36_months_Men_Jeans, 0) ,total_12_months_Men_Sweaters = COALESCE(total_12_months_Men_Sweaters, 0) ,total_24_months_Men_Sweaters = COALESCE(total_24_months_Men_Sweaters, 0) ,total_36_months_Men_Sweaters = COALESCE(total_36_months_Men_Sweaters, 0) ,total_12_months_Women_Leggings = COALESCE(total_12_months_Women_Leggings, 0) ,total_24_months_Women_Leggings = COALESCE(total_24_months_Women_Leggings, 0) ,total_36_months_Women_Leggings = COALESCE(total_36_months_Women_Leggings, 0) ,total_12_months_Women_Jumpsuits_Rompers = COALESCE(total_12_months_Women_Jumpsuits_Rompers, 0) ,total_24_months_Women_Jumpsuits_Rompers = COALESCE(total_24_months_Women_Jumpsuits_Rompers, 0) ,total_36_months_Women_Jumpsuits_Rompers = COALESCE(total_36_months_Women_Jumpsuits_Rompers, 0) ,total_12_months_Men_Outerwear_Coats = COALESCE(total_12_months_Men_Outerwear_Coats, 0) ,total_24_months_Men_Outerwear_Coats = COALESCE(total_24_months_Men_Outerwear_Coats, 0) ,total_36_months_Men_Outerwear_Coats = COALESCE(total_36_months_Men_Outerwear_Coats, 0) ,total_12_months_Women_ClothingSets = COALESCE(total_12_months_Women_ClothingSets, 0) ,total_24_months_Women_ClothingSets = COALESCE(total_24_months_Women_ClothingSets, 0) ,total_36_months_Women_ClothingSets = COALESCE(total_36_months_Women_ClothingSets, 0) WHERE true;
 
 
--- Create the k-means model
+-- Step 3: Create the k-means model
 
 CREATE OR REPLACE MODEL
   `my-project.my-dataset.customer_segments_model`
@@ -111,9 +111,9 @@ FROM
 
 
 
--- [Optional] Create the LLM model pointer
+-- Step 4: Create the LLM model pointer
 CREATE MODEL `my-project.my-dataset.gemini-llm`
- REMOTE WITH CONNECTION `my-project.us.customer-demo-llm-connection`
+ REMOTE WITH CONNECTION `my-project.us.my-remote-connection`
  OPTIONS(ENDPOINT = 'gemini-pro')
 
 -- Run the model and generate customer segments
